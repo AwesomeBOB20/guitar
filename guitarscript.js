@@ -1,10 +1,12 @@
 let curTheme='dark', namingMode='sharp', linkedNav=true, labelMode='notes';
 
 function toggleCollapse(headerEl){headerEl.classList.toggle('open');const body=headerEl.nextElementSibling;if(body)body.classList.toggle('open')}
+// --- START OF SNIPPET REPLACEMENT ---
 function isMobile(){return window.innerWidth<=768}
-function initMobileCollapse(){if(!isMobile())return;document.querySelectorAll('.collapse-body-target').forEach(el=>{el.classList.add('collapse-body');el.classList.remove('open')})}
-window.addEventListener('resize',()=>{document.querySelectorAll('.collapse-body-target').forEach(el=>{if(!isMobile()){el.classList.remove('collapse-body','open');el.style.display=''}else if(!el.classList.contains('collapse-body')){el.classList.add('collapse-body')}})})
+function initMobileCollapse(){if(!isMobile())return;document.querySelectorAll('.collapse-body-target').forEach(el=>{el.classList.add('collapse-body', 'open');const hdr=el.previousElementSibling;if(hdr&&hdr.classList.contains('collapse-header'))hdr.classList.add('open');})}
+window.addEventListener('resize',()=>{document.querySelectorAll('.collapse-body-target').forEach(el=>{if(!isMobile()){el.classList.remove('collapse-body','open');el.style.display='';const hdr=el.previousElementSibling;if(hdr&&hdr.classList.contains('collapse-header'))hdr.classList.remove('open');}else if(!el.classList.contains('collapse-body')){el.classList.add('collapse-body')}})})
 document.addEventListener('DOMContentLoaded',initMobileCollapse);
+// --- END OF SNIPPET REPLACEMENT ---
 
 const DARK_THEMES={dark:1,warm:1,ocean:1,gold:1,mint:1,rose:1,vapor:1,midnight:1,ember:1,slate:1};
 const THEME_VARS={
