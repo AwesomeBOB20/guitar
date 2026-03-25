@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jazz Chord Practice</title>
+<link rel="stylesheet" href="guitarstyles.css">
+</head>
+<body>
+<div class="app">
+<div class="hdr"><h1>Jazz Chord Practice</h1><div class="hdr-right"><div class="stats-inline" id="statsInline" style="display:none"><div><span id="statC">0</span> chords</div><div>streak <span id="statS">0</span></div><div id="statQ" style="display:none">quiz <span id="statSc">0/0</span></div></div><div class="hdr-keys"><kbd>R</kbd> new · <kbd>Space</kbd> play/stop</div><div class="theme-picker"><div class="theme-dot td-dark on" onclick="setTheme('dark')" title="Dark"></div><div class="theme-dot td-light" onclick="setTheme('light')" title="Light"></div><div class="theme-dot td-midnight" onclick="setTheme('midnight')" title="Midnight"></div><div class="theme-dot td-ocean" onclick="setTheme('ocean')" title="Ocean"></div><div class="theme-dot td-slate" onclick="setTheme('slate')" title="Slate"></div><div class="theme-dot td-mint" onclick="setTheme('mint')" title="Mint"></div><div class="theme-dot td-vapor" onclick="setTheme('vapor')" title="Vapor"></div><div class="theme-dot td-rose" onclick="setTheme('rose')" title="Rose"></div><div class="theme-dot td-gold" onclick="setTheme('gold')" title="Gold"></div><div class="theme-dot td-ember" onclick="setTheme('ember')" title="Ember"></div><div class="theme-dot td-warm" onclick="setTheme('warm')" title="Warm"></div></div></div></div>
+
+<div class="history-strip" id="hist" style="display:none"></div>
+<div class="row1">
+<div class="main-col">
+<div class="panel" style="padding:16px" id="mainCard">
+<div id="chordView"><div class="chord-hero" id="chordHero"><div class="playing-dot" id="pdot"><div class="pdot"></div>playing</div><div class="chord-name-root" id="cRoot"></div><div class="chord-name-type" id="cType"></div><div class="chord-formula" id="cFormula"></div></div><div class="notes-pills" id="notePills"></div>
+<div id="triadListSec" class="triad-list" style="display:none"><span class="triad-list-lbl">TRIADS</span><span id="triadListTags"></span></div>
+
+<div id="shellListSec" class="triad-list" style="display:none"><span class="triad-list-lbl">SHELLS</span><span id="shellListTags"></span></div>
+
+<div id="drop2ListSec" class="triad-list" style="display:none"><span class="triad-list-lbl">DROP 2</span><span id="drop2ListTags"></span></div>
+
+<div id="progSec" style="display:none" class="prog-strip"><span class="prog-lbl">PROGS</span><div id="progList" style="display:flex;flex-direction:column;gap:6px;flex:1"></div></div>
+</div>
+<div id="quizView" style="display:none"><div class="quiz-panel" onclick="if(quizTimeout){skipQuizWait()}"><div class="quiz-hear-lbl">IDENTIFY THIS CHORD</div><div class="quiz-root-big" id="qRoot"></div><div class="quiz-opts" id="qOpts"></div><div class="score-strip" id="scoreSt" style="display:none">score <span id="scoreTx">0 / 0</span></div><div id="skipHint" style="display:none;text-align:center;font-size:10px;color:var(--txt3);margin-top:6px">tap or Space to continue</div><button class="btn btn-sm reveal-btn" id="revBtn" onclick="revealQuiz()" style="display:none">Reveal answer</button></div></div>
+</div>
+</div><div class="right-top">
+<div class="panel settings">
+<div class="mode-tabs"><div class="mode-tab on" id="modeRandom" onclick="setInputMode('random')">Random</div><div class="mode-tab" id="modeManual" onclick="setInputMode('manual')">Manual</div></div>
+<div class="ctrl-btns" id="randomBtns"><button class="btn btn-primary" onclick="generate()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>New Chord<span class="kbd-hint">r</span></button><button class="btn btn-play" onclick="playChord()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Play<span class="kbd-hint">space</span></button></div>
+<div class="ctrl-btns" id="manualBtns" style="display:none"><button class="btn btn-play" onclick="playChord()" style="grid-column:1/-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Play<span class="kbd-hint">space</span></button></div>
+<button class="btn btn-stop btn-sm" id="stopBtn" onclick="stopAll()" style="display:none">■ Stop</button>
+<div class="toggle-row"><button class="btn btn-sm" id="arpBtn" onclick="toggleArp()">Arp: <span id="arpLbl">off</span></button><button class="btn btn-sm" id="quizBtn" onclick="toggleQuiz()">Quiz: <span id="quizLbl">off</span></button></div>
+<div class="collapse-header" onclick="toggleCollapse(this)"><span class="collapse-title">SETTINGS</span><span class="collapse-arrow">▼</span></div>
+<div class="opt-group collapse-body-target">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-bottom:1px dashed var(--sg-b)">
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">MODE</span><div class="opt-btns"><button class="opt-btn on" data-mode="once" onclick="setMode('once',this)">Once</button><button class="opt-btn" data-mode="hold" onclick="setMode('hold',this)">Hold</button></div></div></div>
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">SRC</span><div class="opt-btns"><button class="opt-btn on" id="srcPiano" onclick="setSrc('piano')">Piano</button><button class="opt-btn" id="srcGuitar" onclick="setSrc('guitar')">Guitar</button></div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-bottom:1px dashed var(--sg-b)">
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">LABEL</span><div class="opt-btns"><button class="opt-btn on" id="lblNotes" onclick="setLabels('notes',this)">Notes</button><button class="opt-btn" id="lblDegrees" onclick="setLabels('degrees',this)">Deg</button></div></div></div>
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">NAME</span><div class="opt-btns"><button class="opt-btn on" id="nameSharp" onclick="setNaming('sharp')">Sharp</button><button class="opt-btn" id="nameFlat" onclick="setNaming('flat')">Flat</button></div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-bottom:1px dashed var(--sg-b)">
+<div class="opt-row" id="rhythmRow" style="display:none"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">RHYM</span><div class="opt-btns"><button class="opt-btn on" id="rhStraight" onclick="setRhythm('straight',this)">Duple</button><button class="opt-btn" id="rhTriplet" onclick="setRhythm('triplet',this)">Triplet</button></div></div></div>
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">OCT</span><div class="opt-btns"><button class="opt-btn" onclick="shiftOct(-1)">−</button><span id="octDisplay" style="font-family:'Fira Code',monospace;font-size:12px;color:var(--txt);min-width:24px;text-align:center">4</span><button class="opt-btn" onclick="shiftOct(1)">+</button></div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-bottom:1px dashed var(--sg-b)">
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">INV</span><div class="opt-btns"><button class="opt-btn on" data-inv="root" onclick="setInv('root',this)">R</button><button class="opt-btn" data-inv="1st" onclick="setInv('1st',this)">1</button><button class="opt-btn" data-inv="2nd" onclick="setInv('2nd',this)">2</button><button class="opt-btn" id="inv3btn" data-inv="3rd" onclick="setInv('3rd',this)">3</button></div></div></div>
+<div class="opt-row"><div class="opt-row-inner" style="border:none"><span class="opt-lbl">VOICE</span><div class="opt-btns"><button class="opt-btn on" id="voiceFull" onclick="setVoice('full',this)">Full</button><button class="opt-btn" id="voiceShell" onclick="setVoice('shell',this)">Shell</button></div></div></div>
+</div>
+<div class="opt-row"><div class="opt-row-inner" style="flex:1"><span class="opt-lbl">BPM</span><input type="range" class="vol-slider" id="bpmSlider" min="40" max="240" value="120" step="1" oninput="document.getElementById('bpmVal').textContent=this.value" onchange="setBpm(this.value)" style="flex:1"><span id="bpmVal" style="font-family:'Fira Code',monospace;font-size:12px;color:var(--txt);min-width:32px;text-align:right;font-weight:600">120</span></div></div>
+
+
+<div class="opt-row"><div class="opt-row-inner" style="flex:1"><span class="opt-lbl">VOL</span><input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="60" oninput="document.getElementById('volVal').textContent=this.value+'%'" style="flex:1"><span id="volVal" style="font-family:'Fira Code',monospace;font-size:12px;color:var(--txt);min-width:32px;text-align:right;font-weight:600">60%</span></div></div>
+</div>
+</div>
+<div class="panel selector-panel"><div class="collapse-header" onclick="toggleCollapse(this)"><span class="collapse-title">CHORD TYPES</span><span class="collapse-arrow">▼</span></div><div class="collapse-body-target"><div id="rootSection" style="display:none"><div class="root-grid" style="align-items:flex-start"><span class="grp-lbl" style="padding-top:5px">ROOT</span><div id="rootGrid" style="display:flex;gap:5px;flex-wrap:wrap;flex:1"></div></div></div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div class="sel-label" style="margin-bottom:0">CHORD TYPES</div><div class="sa-row" id="saRow"><button class="sa-btn" onclick="selectAll()">All</button><button class="sa-btn" onclick="selectNone()">None</button></div></div><div id="fGrid" style="display:flex;flex-direction:column"></div></div></div>
+</div><div class="panel" style="padding:12px 16px" id="pianoPanel"><div class="collapse-header" onclick="toggleCollapse(this)"><span class="collapse-title">PIANO</span><span class="collapse-arrow">▼</span></div><div class="collapse-body-target"><div class="diag-label">PIANO — scroll to explore, click to play</div><div class="piano-scroll-track" id="pianoTrack"><div class="piano-scroll-thumb" id="pianoThumb"></div></div><div class="piano-wrap" id="pianoWrap"><div id="pianoKeys"></div></div></div></div>
+</div><div class="panel guitar-panel" id="guitarSection" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px"><span class="diag-label" style="margin-bottom:0" id="guitarDiagLabel">GUITAR TRIADS — click notes to play</span><div style="display:flex;align-items:center;gap:8px"><button class="opt-btn on" id="gTabTriads" onclick="setGuitarDiagMode('triads')">Triads</button><button class="opt-btn" id="gTabShells" onclick="setGuitarDiagMode('shells')">Shells</button><button class="opt-btn" id="gTabDrop2" onclick="setGuitarDiagMode('drop2')">Drop 2</button><button class="link-btn on" id="linkBtn" onclick="toggleLink()" title="Link/unlink diagram navigation">Linked</button><div class="gfinger-legend" id="guitarLegend"></div></div></div><div class="guitar-grid" id="guitarStringGroups"></div></div>
+
+</div>
+<script src="guitarscript.js"></script>
+</body>
+</html>
