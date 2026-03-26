@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Jazz Chord Practice</title>
+<link rel="stylesheet" href="guitarstyles.css">
+</head>
+<body data-active-tab="play">
+<div class="app">
+<div class="mobile-scrim" onclick="setMobileTab('play')"></div>
+<div class="hdr"><h1>Jazz Chord Practice</h1>
+<div class="hdr-right"><div class="hdr-keys"><kbd>R</kbd> new · <kbd>Space</kbd> play/stop</div>
+<div class="theme-picker"><div class="theme-dot td-dark on" onclick="setTheme('dark')" title="Dark"></div><div class="theme-dot td-ocean" onclick="setTheme('ocean')" title="Ocean"></div><div class="theme-dot td-mocha" onclick="setTheme('mocha')" title="Mocha"></div><div class="theme-dot td-warm" onclick="setTheme('warm')" title="Warm"></div><div class="theme-dot td-light" onclick="setTheme('light')" title="Light"></div><div class="theme-dot td-frost" onclick="setTheme('frost')" title="Frost"></div><div class="theme-dot td-sage" onclick="setTheme('sage')" title="Sage"></div><div class="theme-dot td-latte" onclick="setTheme('latte')" title="Latte"></div></div></div>
+</div>
+
+<div class="control-deck" id="topControls">
+  <div class="deck-segment input-toggle">
+    <button class="deck-btn mode-btn on" id="modeRandom" onclick="setInputMode('random')">Random</button>
+    <button class="deck-btn mode-btn" id="modeManual" onclick="setInputMode('manual')">Manual</button>
+  </div>
+
+  <div class="deck-segment main-actions">
+    <button class="deck-btn action-btn new-chord-btn" id="topNewBtn" onclick="generate()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> 
+      New Chord
+    </button>
+    <button class="deck-btn action-btn play-btn" id="topPlayBtn" onclick="playChord()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> 
+      Play
+    </button>
+    <button class="deck-btn action-btn stop-btn" id="topStopBtn" onclick="stopAll()" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg> 
+      Stop
+    </button>
+  </div>
+
+  <div class="deck-segment quiz-toggle">
+    <button class="deck-btn quiz-btn" id="quizBtn" onclick="toggleQuiz()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Quiz: <span id="quizLbl" style="margin-left:4px;">OFF</span>
+    </button>
+  </div>
+</div>
+<div class="row1">
+  <div class="main-col">
+    <div class="panel" style="padding:0px 12px 8px 0; height:100%;" id="mainCard">
+      <div id="chordView" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+        <div class="main-card-split" style="height: 100%;">
+          
+          <div class="hero-col">
+            <div class="chord-hero" id="chordHero" style="padding: 0; display: flex; flex-direction: column; align-items: center;">
+              <div style="display:flex; align-items:center; justify-content:flex-start; gap:12px;">
+                <div class="chord-name-root" id="cRoot" style="font-size:54px; letter-spacing:-1px; line-height:1;"></div>
+                <div class="chord-name-type" id="cType" style="font-size:24px; color:var(--txt2); font-weight:600;"></div>
+              </div>
+              <div class="chord-formula" id="cFormula" style="font-size:14px; margin-top:6px; text-align: left;"></div>
+            </div>
+          </div>
+
+          <div class="pills-col">
+            <div class="notes-pills" id="notePills" style="margin-top:0; margin-bottom:0; gap:10px; justify-content:center;"></div>
+          </div>
+
+          <div class="var-col">
+            <div class="ui-toggle" id="varTabs" style="display:flex; width: 100%; margin-top:0;">
+              <button class="ui-btn on" style="flex: 1;" id="vtTriads" onclick="setVariationTab('triads')">Triads</button>
+              <button class="ui-btn" style="flex: 1;" id="vtShells" onclick="setVariationTab('shells')">Shells</button>
+              <button class="ui-btn" style="flex: 1;" id="vtDrop2" onclick="setVariationTab('drop2')">Drop 2</button>
+              <button class="ui-btn" style="flex: 1;" id="vtProgs" onclick="setVariationTab('progs')">Progs</button>
+            </div>
+            <div id="triadListSec" class="triad-list variation-panel active-var" style="display:none"><span id="triadListTags"></span></div>
+            <div id="shellListSec" class="triad-list variation-panel" style="display:none"><span id="shellListTags"></span></div>
+            <div id="drop2ListSec" class="triad-list variation-panel" style="display:none"><span id="drop2ListTags"></span></div>
+            <div id="progSec" style="display:none" class="prog-strip variation-panel"><div id="progList" style="display:flex;flex-direction:column;gap:8px;flex:1"></div></div>
+          </div>
+          
+        </div>
+      </div>
+      <div id="quizView" style="display:none">
+        <div class="quiz-panel" onclick="if(quizTimeout){skipQuizWait()}">
+          <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px;">
+            <button class="opt-btn on" id="qtVisual" onclick="setQuizType('visual')">Visual Quiz</button>
+            <button class="opt-btn" id="qtAudio" onclick="setQuizType('audio')">Ear Training</button>
+          </div>
+          <div class="quiz-hear-lbl">IDENTIFY THIS CHORD</div>
+          <div class="quiz-root-big" id="qRoot"></div>
+          <div class="quiz-opts" id="qOpts"></div>
+          <div id="skipHint" style="display:none;text-align:center;font-size:10px;color:var(--txt3);margin-top:6px">tap or Space to continue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-col">
+    <div class="panel settings" style="height:100%;">
+      
+      <div class="mobile-theme-picker" style="display:none; justify-content:space-between; align-items:center; padding-bottom:16px; border-bottom:1px dashed var(--sg-b);">
+        <span class="opt-lbl" style="font-size:11px;">THEME</span>
+        <div class="theme-picker"><div class="theme-dot td-dark on" onclick="setTheme('dark')" title="Dark"></div><div class="theme-dot td-ocean" onclick="setTheme('ocean')" title="Ocean"></div><div class="theme-dot td-mocha" onclick="setTheme('mocha')" title="Mocha"></div><div class="theme-dot td-warm" onclick="setTheme('warm')" title="Warm"></div><div class="theme-dot td-light" onclick="setTheme('light')" title="Light"></div><div class="theme-dot td-frost" onclick="setTheme('frost')" title="Frost"></div><div class="theme-dot td-sage" onclick="setTheme('sage')" title="Sage"></div><div class="theme-dot td-latte" onclick="setTheme('latte')" title="Latte"></div></div>
+      </div>
+
+      <div class="opt-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 16px; flex: 1; grid-auto-rows: 1fr;">
+        
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: 1px dashed var(--sg-b);"><span class="opt-lbl">ARP</span><div class="opt-btns"><button class="opt-btn on" id="arpOff" onclick="setArp(false)">Off</button><button class="opt-btn" id="arpOn" onclick="setArp(true)">On</button></div></div></div>
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: 1px dashed var(--sg-b);"><span class="opt-lbl">MODE</span><div class="opt-btns"><button class="opt-btn on" data-mode="once" onclick="setMode('once',this)">Once</button><button class="opt-btn" data-mode="hold" onclick="setMode('hold',this)">Hold</button></div></div></div>
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: 1px dashed var(--sg-b);"><span class="opt-lbl">SRC</span><div class="opt-btns"><button class="opt-btn on" id="srcPiano" onclick="setSrc('piano')">Piano</button><button class="opt-btn" id="srcGuitar" onclick="setSrc('guitar')">Guitar</button></div></div></div>
+        
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: 1px dashed var(--sg-b);"><span class="opt-lbl">LABEL</span><div class="opt-btns"><button class="opt-btn on" id="lblNotes" onclick="setLabels('notes',this)">Notes</button><button class="opt-btn" id="lblDegrees" onclick="setLabels('degrees',this)">Deg</button></div></div></div>
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: 1px dashed var(--sg-b);"><span class="opt-lbl">NAME</span><div class="opt-btns"><button class="opt-btn on" id="nameSharp" onclick="setNaming('sharp')">Sharp</button><button class="opt-btn" id="nameFlat" onclick="setNaming('flat')">Flat</button></div></div></div>
+        <div class="opt-row" id="rhythmRow"><div class="opt-row-inner" style="border-bottom: 1px dashed var(--sg-b);"><span class="opt-lbl">RHYTH</span><div class="opt-btns"><button class="opt-btn on" id="rhStraight" onclick="setRhythm('straight')">Straight</button><button class="opt-btn" id="rhTriplet" onclick="setRhythm('triplet')">Triplet</button></div></div></div>
+        
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: none;"><span class="opt-lbl">VOICE</span><div class="opt-btns"><button class="opt-btn on" id="voiceFull" onclick="setVoice('full',this)">Full</button><button class="opt-btn" id="voiceShell" onclick="setVoice('shell',this)">Shell</button></div></div></div>
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: none;"><span class="opt-lbl">INV</span><div class="opt-btns"><button class="opt-btn on" data-inv="root" onclick="setInv('root',this)">R</button><button class="opt-btn" data-inv="1st" onclick="setInv('1st',this)">1</button><button class="opt-btn" data-inv="2nd" onclick="setInv('2nd',this)">2</button><button class="opt-btn" id="inv3btn" data-inv="3rd" onclick="setInv('3rd',this)">3</button></div></div></div>
+        <div class="opt-row"><div class="opt-row-inner" style="border-bottom: none;"><span class="opt-lbl">OCT</span><div class="opt-btns"><button class="opt-btn" onclick="shiftOct(-1)">−</button><span id="octDisplay" style="min-width:24px;text-align:center;">4</span><button class="opt-btn" onclick="shiftOct(1)">+</button></div></div></div>
+      
+      </div>
+
+      <div class="opt-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; border-top: 1px dashed var(--sg-b); padding-top: 16px;">
+        <div class="opt-row-inner" style="padding:0; border:none; gap:12px;"><span class="opt-lbl">BPM</span><input type="range" class="vol-slider" id="bpmSlider" min="40" max="240" value="120" oninput="document.getElementById('bpmVal').textContent=this.value; setBpm(this.value);" style="flex:1"><span id="bpmVal" style="min-width:32px;text-align:right;">120</span></div>
+        <div class="opt-row-inner" style="padding:0; border:none; gap:12px;"><span class="opt-lbl">VOL</span><input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="60" oninput="document.getElementById('volVal').textContent=this.value+'%';" style="flex:1"><span id="volVal" style="min-width:32px;text-align:right;">60%</span></div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="selector-col">
+    <div class="panel selector-panel" style="height:100%;">
+      <div id="rootSection" style="display:none">
+        <div class="root-grid"><span class="grp-lbl">ROOT</span><div id="rootGrid" style="display:flex;gap:8px;flex-wrap:wrap;"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="sel-label">CHORD TYPES</div>
+        <div class="ui-toggle" id="saRow"><button class="ui-btn on" id="saAllBtn" onclick="selectAll()">All</button><button class="ui-btn" id="saNoneBtn" onclick="selectNone()">None</button></div>
+      </div>
+      <div id="fGrid"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:8px 12px; width:100%;" id="instrumentPanel">
+    <div class="instrument-hdr" style="display:flex; flex-wrap:nowrap; flex-direction:row; align-items:center; width:100%; overflow-x:auto; scrollbar-width:none;">
+      <div class="ui-toggle" id="instrToggle" style="flex-shrink:0;">
+        <button class="ui-btn on" id="instPiano" onclick="toggleInstrument('piano')">Piano</button>
+        <button class="ui-btn" id="instGuitar" onclick="toggleInstrument('guitar')">Guitar</button>
+      </div>
+      <span id="instrLabel" style="display:none;"></span> <div class="guitar-ctrl-row" id="guitarHeaderControls" style="display:none; flex:1; margin-left:15px; align-items:center; justify-content:space-between; flex-wrap:nowrap;">
+        <div class="g-util-btns" style="display:flex; gap:8px; align-items:center; flex:1; justify-content:space-between;">
+           <div class="g-util-toggles" style="display:flex; gap:8px;">
+             <div class="ui-toggle"><button class="ui-btn on" id="sortListBtn" onclick="setGuitarSort('list')">List</button><button class="ui-btn" id="sortFretBtn" onclick="setGuitarSort('fretboard')">Fretboard</button></div>
+             <div class="ui-toggle"><button class="ui-btn on" id="linkOnBtn" onclick="setLink(true)">Linked</button><button class="ui-btn" id="linkOffBtn" onclick="setLink(false)">Unlinked</button></div>
+           </div>
+           <div class="gfinger-legend" id="guitarLegend" style="display:flex; align-items:center;"></div>
+        </div>
+      </div>
+    </div>
+    <div id="pianoView">
+      <div class="piano-scroll-track" id="pianoTrack"><div class="piano-scroll-thumb" id="pianoThumb"></div></div>
+      <div class="piano-wrap" id="pianoWrap"><div id="pianoKeys"></div></div>
+    </div>
+    <div id="guitarView" style="display:none;">
+      <div class="guitar-grid" id="guitarStringGroups"></div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-item" id="navSelector" onclick="setMobileTab('selector', event)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+    <span>Chords</span>
+  </div>
+  <div class="nav-item active" id="navPlay" onclick="setMobileTab('play', event)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    <span>Play</span>
+  </div>
+  <div class="nav-item" id="navSettings" onclick="setMobileTab('settings', event)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    <span>Settings</span>
+  </div>
+</div>
+<script src="guitarscript.js"></script>
+</body>
+</html>
