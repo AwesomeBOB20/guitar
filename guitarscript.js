@@ -134,11 +134,11 @@ const THEME_VARS={
 ocean:{bg:'#0C1520',card:'#142030',cardB:'#2A4060',muted:'#1A2840',txt:'#D8E8F8',txt2:'#88A8C8',txt3:'#587898',accent:'#40A0E0',green:'#40C890',btnBg:'#1A2840',btnHvr:'#2A3850',sgBg:'#1A2840',sgB:'#2A4060',tagBg:'#1A2840',tagC:'#88A8C8'},
 mocha:{bg:'#16140F',card:'#1E1C17',cardB:'#4A453C',muted:'#28251D',txt:'#E8E4DC',txt2:'#B0A898',txt3:'#807868',accent:'#D85A30',green:'#2EAE6E',btnBg:'#28251D',btnHvr:'#3A362E',sgBg:'#28251D',sgB:'#4A453C',tagBg:'#28251D',tagC:'#B0A898'},
 warm:{bg:'#1C1410',card:'#28201A',cardB:'#5C4838',muted:'#342A22',txt:'#F0E0D0',txt2:'#C8A888',txt3:'#907060',accent:'#D85A30',green:'#40B878',btnBg:'#342A22',btnHvr:'#443830',sgBg:'#342A22',sgB:'#5C4838',tagBg:'#342A22',tagC:'#C8A888'},
-frost:{bg:'#C5DCED',card:'#F2F8FC',cardB:'#A2C4DD',muted:'#B2CDE0',txt:'#1A3B5C',txt2:'#4A6B8C',txt3:'#6A8BA8',accent:'#0066CC',green:'#108A6A',btnBg:'#F2F8FC',btnHvr:'#CFE2F0',sgBg:'#CFE2F0',sgB:'#A2C4DD',tagBg:'#CFE2F0',tagC:'#4A6B8C'},
+frost:{bg:'#C5DCED',card:'#F2F8FC',cardB:'#A2C4DD',muted:'#B2CDE0',txt:'#1A3B5C',txt2:'#4A6B8C',txt3:'#6A8BA8',accent:'#378ADD',green:'#108A6A',btnBg:'#F2F8FC',btnHvr:'#CFE2F0',sgBg:'#CFE2F0',sgB:'#A2C4DD',tagBg:'#CFE2F0',tagC:'#4A6B8C'},
 sage:{bg:'#C2D9C6',card:'#F4F9F4',cardB:'#A1C7A5',muted:'#B1CEB5',txt:'#1F4022',txt2:'#4A6B4D',txt3:'#6A8A6D',accent:'#1E8232',green:'#1E8232',btnBg:'#F4F9F4',btnHvr:'#CBE2CE',sgBg:'#CBE2CE',sgB:'#A1C7A5',tagBg:'#CBE2CE',tagC:'#4A6B4D'},
 latte:{bg:'#EACAB3',card:'#FCF4ED',cardB:'#D9B193',muted:'#E2BFA4',txt:'#542D15',txt2:'#8C5A3B',txt3:'#AA7A5B',accent:'#D85A30',green:'#2EAE6E',btnBg:'#FCF4ED',btnHvr:'#EDD2C0',sgBg:'#EDD2C0',sgB:'#D9B193',tagBg:'#EDD2C0',tagC:'#8C5A3B'}
 };
-function applyThemeVars(t){const el=document.documentElement.style;if(t==='light'||t==='dark'){el.cssText='';return}const v=THEME_VARS[t];if(!v){el.cssText='';return}el.setProperty('--bg',v.bg);el.setProperty('--card',v.card);el.setProperty('--card-b','1px solid '+v.cardB);el.setProperty('--muted',v.muted);el.setProperty('--muted-b','1px solid '+v.cardB);el.setProperty('--txt',v.txt);el.setProperty('--txt2',v.txt2);el.setProperty('--txt3',v.txt3);el.setProperty('--accent',v.accent);el.setProperty('--green',v.green);el.setProperty('--btn-bg',v.btnBg);el.setProperty('--btn-hvr',v.btnHvr);el.setProperty('--inv-bg',v.txt);el.setProperty('--inv-fg',v.bg);el.setProperty('--sg-bg',v.sgBg);el.setProperty('--sg-b',v.sgB);el.setProperty('--tag-bg',v.tagBg);el.setProperty('--tag-c',v.tagC)}
+function applyThemeVars(t){const el=document.documentElement.style;if(t==='light'||t==='dark'){el.cssText='';return}const v=THEME_VARS[t];if(!v){el.cssText='';return}el.setProperty('--bg',v.bg);el.setProperty('--card',v.card);el.setProperty('--card-b','2px solid '+v.cardB);el.setProperty('--muted',v.muted);el.setProperty('--muted-b','2px solid '+v.cardB);el.setProperty('--txt',v.txt);el.setProperty('--txt2',v.txt2);el.setProperty('--txt3',v.txt3);el.setProperty('--accent',v.accent);el.setProperty('--green',v.green);el.setProperty('--btn-bg',v.btnBg);el.setProperty('--btn-hvr',v.btnHvr);el.setProperty('--inv-bg',v.txt);el.setProperty('--inv-fg',v.bg);el.setProperty('--sg-bg',v.sgBg);el.setProperty('--sg-b',v.sgB);el.setProperty('--tag-bg',v.tagBg);el.setProperty('--tag-c',v.tagC)}
 
 function setLabels(m,el){
   labelMode=m;
@@ -678,6 +678,8 @@ let ctd=[],sgi=[0,0,0];
 const HL=['lroot','l3','l5','l7','l9','l11','l13','ld'];
 
 function buildPiano(){
+  const wrap=document.getElementById('pianoWrap');
+  const prevScroll=wrap?wrap.scrollLeft:0;
   const c=document.getElementById('pianoKeys');c.innerHTML='';
   const ch=cur?cur.ch:null;
   const rootSemi=cur?cur.rootSemi:0;
@@ -745,6 +747,9 @@ function buildPiano(){
     inner.appendChild(k);
   });
   c.appendChild(inner);
+  
+  if(wrap) wrap.scrollLeft=prevScroll; /* Connects the camera pan seamlessly! */
+  
       requestAnimationFrame(()=>{
         syncPianoThumb();
       });
@@ -752,15 +757,35 @@ function buildPiano(){
 
 function centerPianoOnChord(){
   const wrap=document.getElementById('pianoWrap');if(!wrap)return;
+  const inner=wrap.querySelector('.piano-inner');if(!inner)return;
   
-  // Now includes .quiz-hl so it can find and center on hidden quiz chords!
-  const highlighted=wrap.querySelectorAll('.lroot,.l3,.l5,.l7,.l9,.l11,.l13,.ld,.quiz-hl');
+  // Now includes .quiz-hl and [data-prog-hl="1"] to find quiz chords and previewed voicings!
+  const highlighted=wrap.querySelectorAll('.lroot,.l3,.l5,.l7,.l9,.l11,.l13,.ld,.quiz-hl,[data-prog-hl="1"]');
   
   if(!highlighted.length)return;
+  
   let minL=Infinity,maxR=0;
-  highlighted.forEach(k=>{const l=parseFloat(k.style.left)||0;const w=parseFloat(k.style.width)||42;if(l<minL)minL=l;if(l+w>maxR)maxR=l+w});
+  const innerRect = inner.getBoundingClientRect();
+  
+  highlighted.forEach(k=>{
+      const rect = k.getBoundingClientRect();
+      const l = rect.left - innerRect.left; // Bulletproof way to read exact pixels, bypassing CSS calc()
+      const w = rect.width;
+      if(l<minL)minL=l;
+      if(l+w>maxR)maxR=l+w;
+  });
+  
   const center=(minL+maxR)/2;
-  wrap.scrollLeft=center-wrap.clientWidth/2;
+  
+  try {
+      wrap.scrollTo({
+          left: center - wrap.clientWidth/2,
+          behavior: 'smooth' /* Adds a premium gliding animation on mobile */
+      });
+  } catch(e) {
+      wrap.scrollLeft = center - wrap.clientWidth/2; // Safe fallback for very old browsers
+  }
+  
   requestAnimationFrame(syncPianoThumb);
 }
 
@@ -902,6 +927,8 @@ function previewVoicingOnPiano(semis, role, rootSemi, chDef) {
   
   semis.forEach(m=>{keys.forEach(k=>{if(parseInt(k.dataset.midi)===m){k.style.transition='none';k.style.background=col[0];k.style.borderColor=col[1];k.dataset.progHl='1';const lbl=k.querySelector('.piano-note-label');if(lbl){lbl.style.transition='none';lbl.style.setProperty('color', '#FFFFFF', 'important');}}})});
   
+  if (currentInstrument === 'piano') centerPianoOnChord();
+
   if(progChordPreviewTimer) clearTimeout(progChordPreviewTimer);
   progChordPreviewTimer = setTimeout(()=>{
     progChordPreviewTimer=null;
@@ -1400,7 +1427,10 @@ function progHighlightPiano(semis,chD,isMainChord,cRoot,chDef){
   progFadeOutMain();
   const keys=document.querySelectorAll('#pianoKeys .wk, #pianoKeys .bk');
   const col=progFuncColor(chD);
-  semis.forEach(m=>{keys.forEach(k=>{if(parseInt(k.dataset.midi)===m){k.style.transition='none';k.style.background=col[0];k.style.borderColor=col[1];k.dataset.progHl='1';const lbl=k.querySelector('.piano-note-label');if(lbl){lbl.style.transition='none';lbl.style.setProperty('color', '#FFFFFF', 'important');}}})});}
+  semis.forEach(m=>{keys.forEach(k=>{if(parseInt(k.dataset.midi)===m){k.style.transition='none';k.style.background=col[0];k.style.borderColor=col[1];k.dataset.progHl='1';const lbl=k.querySelector('.piano-note-label');if(lbl){lbl.style.transition='none';lbl.style.setProperty('color', '#FFFFFF', 'important');}}})});
+  
+  if (currentInstrument === 'piano') centerPianoOnChord();
+}
 
 function progClearPiano(){
   progChordPreviewTimer=null;
@@ -2500,6 +2530,8 @@ function playChord(){
   }
   aK(semis,false);semis.forEach((s,i)=>pT(s,now+i*.008,2.5,ac));
   uiTimer=setTimeout(()=>{if(pd) pd.classList.remove('on');updateFabState(false);},2600);
+  
+  if (currentInstrument === 'piano') centerPianoOnChord();
 }
 
 
@@ -2514,7 +2546,9 @@ cur={type:'maj9',rootSemi:7,flat:false,iv:defCh.iv,roles:defCh.r,ch:defCh};
 document.getElementById('bpmSlider').value=120;
 document.getElementById('volSlider').value=60;
 display();
-centerPianoOnChord();
+setTimeout(() => {
+    centerPianoOnChord();
+}, 150);
 
 
 
